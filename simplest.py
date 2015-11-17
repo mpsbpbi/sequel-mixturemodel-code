@@ -1,5 +1,4 @@
 import h5py
-import numpy as np
 
 ff = h5py.File("/mnt/LIMS/vol73/3100134/0001/m54006_151021_185942.trc.h5", "r")
 
