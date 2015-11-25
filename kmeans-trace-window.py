@@ -19,7 +19,6 @@ starttime = datetime.datetime.now()
 
 for ii in range(numwin):
 
-  print(ii)
   start = (ii*window)
   end = start + window
   xx = np.transpose(tr[myhn][:,start:end])
@@ -40,8 +39,9 @@ for ii in range(numwin):
     for kk in range(res[1].shape[0]):
           results.append( np.concatenate( [ np.array([myhn,ii,kk]), res[1][kk], rescov[kk].flatten() ] ))
 
+for dd in results:
+  print "\t".join([str(xx) for xx in dd])
+
 endtime = datetime.datetime.now()
 print endtime-starttime
 
-for dd in results:
-  print "\t".join([str(xx) for xx in dd])
