@@ -2,6 +2,7 @@ import h5py
 import bisect
 import datetime
 import numpy as np
+import sys
 
 def simplestats( dat ):
   # dat has shape (2, 829440) as in ff['TraceData']['Traces'][myhn-1]
@@ -37,22 +38,34 @@ def simplestatsstable( dat ):
   return( ( mean0,mean1, var0,var1, cov, n, s0,s1, ss0,ss1, sxy, k0,k1) )
 
 ################################
+ofp = open("simplestats.output","w")
+ofp.write("hn\tmean0\tmean1\tvar0\tvar1\tcov\tn\ts0\ts1\tss0\tss1\tsxy\tk0\tk1\n")
+
 ff = h5py.File("/mnt/LIMS/vol73/3100134/0001/m54006_151021_185942.trc.h5", "r")
 
 tr = ff['TraceData']['Traces']
 hn = ff['TraceData']['HoleNumber']
 
-myhn = bisect.bisect(hn, 48955765)
+if len(sys.argv)>1:
+  myhn = int(sys.argv[1])
+else:
+  myhn = bisect.bisect(hn, 48955765)-1
 
-store = []
+if myhn==0:
+  tolen = len(tr)
+else:
+  tolen = 100
+print "myhn", myhn, "tolen", tolen
+
 start = datetime.datetime.now()
-for ii in range(myhn-1,myhn-1+100):
-  store.append(simplestatsstable( tr[ii] ) )
+for ii in range(myhn,myhn+tolen):
+  res = (hn[ii],)+ simplestatsstable( tr[ii] )
+  ofp.write("\t".join([str(xx) for xx in res]))
+  ofp.write("\n")
+  ofp.flush()
 end = datetime.datetime.now()
+
+ofp.close()
 
 dt = end-start
 print dt
-
-print "mean0\tmean1\tvar0\tvar1\tcov\tn\ts0\ts1\tss0\tss1\tsxy\tk0\tk1"
-for dd in store:
-  print "\t".join([str(xx) for xx in dd])
